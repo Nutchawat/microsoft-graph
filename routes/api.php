@@ -18,13 +18,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(array('middleware' => 'api'), function () {
-    Route::get('/calendars/{email}', array(
-        'uses' => '\App\Http\Controllers\MicrosoftGraphController@getCalendars',
-        'as'   => 'microsoft-graph.calendars.get',
+    Route::get('/eventAll/{email}', array(
+        'uses' => '\App\Http\Controllers\MicrosoftGraphController@getEventAll',
+        'as'   => 'microsoft-graph.eventAll.get',
     ));
-    Route::get('/eventsAll/{email}', array(
-        'uses' => '\App\Http\Controllers\MicrosoftGraphController@getEventsAll',
-        'as'   => 'microsoft-graph.eventsAll.get',
+    Route::get('/eventIDAll/{email}', array(
+        'uses' => '\App\Http\Controllers\MicrosoftGraphController@getEventIDAll',
+        'as'   => 'microsoft-graph.eventIDAll.get',
     ));
     Route::get('/events/{email}', array(
         'uses' => '\App\Http\Controllers\MicrosoftGraphController@getEvents',
