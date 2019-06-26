@@ -54,15 +54,6 @@ class MicrosoftGraphController extends Controller
     return $user;
   }
 
-  public function getCalendars($email)
-  {
-    $calendars = $this->graph->createRequest("GET", "/users/".$email."/calendars")
-                  ->setReturnType(Model\Calendar::class)
-                  ->execute();
-
-    return response($calendars, 200);
-  }
-
   private function getBodyEvent($req)
   {
     $user = $this->getUser($req["email"]);
@@ -78,7 +69,7 @@ class MicrosoftGraphController extends Controller
     return $body;
   }
 
-  public function getEventsAll($email)
+  public function getEventAll($email)
   {
     $events = $this->graph->createRequest("GET", "/users/".$email."/events")
                   ->addHeaders($this->headerTimezone)
@@ -86,6 +77,23 @@ class MicrosoftGraphController extends Controller
                   ->execute();
 
     return response($events, 200);
+  }
+
+  public function getEventIDAll($email)
+  {
+    $response = [];
+
+    $events = $this->graph->createRequest("GET", "/users/".$email."/events")
+                  ->addHeaders($this->headerTimezone)
+                  ->setReturnType(Model\Event::class)
+                  ->execute();
+
+    foreach ($events as $key => $event)
+    {
+      $response[$key] = [];
+      $response[$key]["event_id"] = $event->getID();
+    }
+    return response($response, 200);
   }
 
   public function getEvents(Request $request, $email)

@@ -13,8 +13,8 @@ class TokenCache {
       'clientId'                => env('OAUTH_APP_ID'),
       'clientSecret'            => env('OAUTH_APP_PASSWORD'),
       'redirectUri'             => env('OAUTH_REDIRECT_URI'),
-      'urlAuthorize'            => env('OAUTH_AUTHORITY').env('OAUTH_AUTHORIZE_ENDPOINT'),
-      'urlAccessToken'          => env('OAUTH_AUTHORITY').env('OAUTH_TOKEN_ENDPOINT'),
+      'urlAuthorize'            => env('OAUTH_AUTHORITY'),env('OAUTH_TENANT_ID').env('OAUTH_AUTHORIZE_ENDPOINT'),
+      'urlAccessToken'          => env('OAUTH_AUTHORITY').env('OAUTH_TENANT_ID').env('OAUTH_TOKEN_ENDPOINT'),
       'urlResourceOwnerDetails' => '',
       'scopes'                  => env('OAUTH_SCOPES')
     ]);
@@ -43,9 +43,7 @@ class TokenCache {
         empty(session('microsoft-graph-refreshToken')) ||
         empty(session('microsoft-graph-tokenExpires'))) {
       try {
-        $token = $this->oauthClient->getAccessToken('password', [
-          'username' => env('OAUTH_USERNAME'),
-          'password' => env('OAUTH_PASSWORD'),
+        $token = $this->oauthClient->getAccessToken('client_credentials', [
           'scope'    => env('OAUTH_SCOPES')
         ]);
 
