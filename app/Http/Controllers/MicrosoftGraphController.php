@@ -10,15 +10,11 @@ use App\TokenStore\TokenCache;
 
 class MicrosoftGraphController extends Controller
 {
-  protected $graph;
   protected $headerTimezone;
 
   public function __construct()
   {
-    $tokenCache = new TokenCache();
     $this->headerTimezone = [ "Prefer" => "outlook.timezone=\"Pacific Standard Time\"" ];
-    $this->graph = new Graph();
-    $this->graph->setAccessToken($tokenCache->getAccessToken());
     $this->bodyTemplate = [
       "subject" => "",
       "body" => [
@@ -47,7 +43,11 @@ class MicrosoftGraphController extends Controller
 
   private function getUser($email)
   {
-    $user = $this->graph->createRequest("GET", "/users/".$email)
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
+    $user = $graph->createRequest("GET", "/users/".$email)
                   ->setReturnType(Model\User::class)
                   ->execute();
 
@@ -71,7 +71,11 @@ class MicrosoftGraphController extends Controller
 
   public function getEventAll($email)
   {
-    $events = $this->graph->createRequest("GET", "/users/".$email."/events")
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
+    $events = $graph->createRequest("GET", "/users/".$email."/events")
                   ->addHeaders($this->headerTimezone)
                   ->setReturnType(Model\Event::class)
                   ->execute();
@@ -81,9 +85,13 @@ class MicrosoftGraphController extends Controller
 
   public function getEventIDAll($email)
   {
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
     $response = [];
 
-    $events = $this->graph->createRequest("GET", "/users/".$email."/events")
+    $events = $graph->createRequest("GET", "/users/".$email."/events")
                   ->addHeaders($this->headerTimezone)
                   ->setReturnType(Model\Event::class)
                   ->execute();
@@ -98,12 +106,16 @@ class MicrosoftGraphController extends Controller
 
   public function getEvents(Request $request, $email)
   {
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
     $reqs = $request->all();
     $response = [];
 
     foreach($reqs as $key => $req)
     {
-      $event = $this->graph->createRequest("GET", "/users/".$email."/events/".$req["event_id"])
+      $event = $graph->createRequest("GET", "/users/".$email."/events/".$req["event_id"])
                     ->addHeaders($this->headerTimezone)
                     ->setReturnType(Model\Event::class)
                     ->execute();
@@ -115,6 +127,10 @@ class MicrosoftGraphController extends Controller
 
   public function createEvents(Request $request, $email)
   {
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
     $reqs = $request->all();
     $response = [];
 
@@ -122,7 +138,7 @@ class MicrosoftGraphController extends Controller
     {
       $body = $this->getBodyEvent($req);
 
-      $event = $this->graph->createRequest("POST", "/users/".$email."/events")
+      $event = $graph->createRequest("POST", "/users/".$email."/events")
                     ->addHeaders($this->headerTimezone)
                     ->attachBody($body)
                     ->setReturnType(Model\Event::class)
@@ -138,13 +154,17 @@ class MicrosoftGraphController extends Controller
 
   public function updateEvents(Request $request, $email)
   {
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
     $reqs = $request->all();
 
     foreach($reqs as $key => $req)
     {
       $body = $this->getBodyEvent($req);
 
-      $event = $this->graph->createRequest("PATCH", "/users/".$email."/events/".$req["event_id"])
+      $event = $graph->createRequest("PATCH", "/users/".$email."/events/".$req["event_id"])
                     ->addHeaders($this->headerTimezone)
                     ->attachBody($body)
                     ->setReturnType(Model\Event::class)
@@ -156,11 +176,15 @@ class MicrosoftGraphController extends Controller
 
   public function deleteEvents(Request $request, $email)
   {
+    $tokenCache = new TokenCache($email);
+    $graph = new Graph();
+    $graph->setAccessToken($tokenCache->getAccessToken());
+
     $reqs = $request->all();
 
     foreach($reqs as $key => $req)
     {
-      $this->graph->createRequest("DELETE", "/users/".$email."/events/".$req["event_id"])
+      $graph->createRequest("DELETE", "/users/".$email."/events/".$req["event_id"])
                   ->execute();
     }
 
